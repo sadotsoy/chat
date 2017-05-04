@@ -32,7 +32,7 @@ const socketIO = require('socket.io');
 const path = require('path');
 
 const PORT = process.env.PORT || 3000;
-const INDEX = path.join(__dirname, 'public/index.html');
+const INDEX = path.join(__dirname, 'public', 'index.html');
 
 const server = express()
 	.use(express.static(path.join(__dirname)))
@@ -45,9 +45,10 @@ io.on('connection', (socket) => {
 	console.log('Chat Message')
 	socket.on('chatMessage', (from, msg) => {
 		io.emit('chatMessage', from, msg);
+		// setInterval(() => io.emit('chatMessage',from,msg),1000);
 	});
 	socket.on('notifyUser', (user) => {
 		io.emit('notifyUser', user);
+		// setInterval(() => io.emit('notifyUser',user),9000000);
 	});
 });
-
