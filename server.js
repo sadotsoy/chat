@@ -4,6 +4,8 @@ var io = require('socket.io')(http);
 var path = require('path');
 
 // Initialize appication with route / (that means root of the application)
+app.set('port', (process.env.PORT || 5000 ));
+
 app.get('/', function(req, res){
   var express=require('express');
   app.use(express.static(path.join(__dirname)));
@@ -21,6 +23,6 @@ io.on('connection', function(socket){
 });
 
 // Listen application request on port 3000
-http.listen(3000, function(){
-  console.log('listening on *:3000');
-});
+app.listen(app.get('port'), function() {
+	console.log('Node app is running on port', app.get('port'));
+})
