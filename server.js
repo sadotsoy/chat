@@ -50,4 +50,4 @@ io.on('connection', (socket) => {
 		io.emit('notifyUser', user);
 	});
 });
-
+setInterval(() => io.emit('time', new Date().toTimeString()), 1000);
