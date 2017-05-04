@@ -45,9 +45,10 @@ io.on('connection', (socket) => {
 	console.log('Chat Message')
 	socket.on('chatMessage', (from, msg) => {
 		io.emit('chatMessage', from, msg);
+		// setInterval(() => io.emit('chatMessage',from,msg),1000);
 	});
 	socket.on('notifyUser', (user) => {
 		io.emit('notifyUser', user);
+		// setInterval(() => io.emit('notifyUser',user),9000000);
 	});
 });
-setInterval(() => io.emit('time', new Date().toTimeString()), 1000);
