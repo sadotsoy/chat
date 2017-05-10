@@ -1,4 +1,5 @@
 var socket = io();
+var cont = 0;
 var usuarios = {}
 let dom = [
 	[0,0],
@@ -30,7 +31,7 @@ let dom = [
 	[5,6],
 	[6,6]
 ];
-let fichas = []
+let fichasS = [], fichas =[];
 
 function submitfunction(){
   var from = $('#user').val();
@@ -102,14 +103,12 @@ function makeid() {
  }
 
  function getDomino(user) {
-	 for(let i =0; i<5; i++) {
-		let a = Math.floor(Math.random() * (29 -0)) - 0;
-		console.log(dom[a])
-		for (let x of fichas) {
-			if(x === a) console.log('Ya la di')
-			else {
-				fichas.push(a);
-			}
-		}
-	 }
+	 console.log('Start')
+	 let a = Math.floor(Math.random()*(29-0))-0;
+	 fichas.push(5)
+	 console.log(fichas.find(5))
+	 // while(cont < 5) {
+		 // let a = Math.floor(Math.random()*(29-0))-0;
+		 // fichas.find(a)
+	 // }
  }
