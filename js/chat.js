@@ -1,6 +1,6 @@
 var socket = io();
 var cont = 0;
-var usuarios = {}
+let usuarios ={};
 let dom = [
 	[0,0],
 	[0,1],
@@ -38,10 +38,13 @@ function submitfunction(){
   var message = $('#m').val();
   if(message != '') {
 	  if(message == "start") {
-		domino();
+		  message = domino();
 	  }
 	  if(message == "giveme") {
-		getDomino(from);
+		  message = getDomino(from);
+	  }
+	  if(message == "reset") {
+		 message = reset(from);
 	  }
 	socket.emit('chatMessage', from, message);
 	}
@@ -72,7 +75,7 @@ socket.on('notifyUser', function(user){
 $(document).ready(function(){
   var name = makeid();
   $('#user').val(name);
-	socket.emit('chatMessage', 'System', '<b>' + name + '</b> has joined the discussion ---> to play domino use this commands, '+'<b>'+'start'+'</b>'+' to start the game, '+'<b>'+'giveme'+'</b>'+' to recieve dominoes.');
+	socket.emit('chatMessage', 'System', '<b>' + name + '</b> has joined the discussion ---> to play domino use this commands, '+'<b>'+'start'+'</b>'+' to start the game, '+'<b>'+'giveme'+'</b>'+' to recieve dominoes, '+'<b>'+' reset '+'</b>'+' to get a new Dominoes.');
   // usuarios.username = name;
   // usuarios.number = Math.floor(Math.random()* (10 - 0)) + 0;
 	socket.emit('saveUser',name)
@@ -89,26 +92,29 @@ function makeid() {
 }
  socket.on('saveUser', function(user) {
 	 Object.defineProperty(usuarios, user, {
-		 enumerable: false,
+		 enumerable: true,
 		 configurable: true,
 		 writable: true,
-		 value: 'static'
+		 value: {}
 	 });
-	 console.log(usuarios)
- })
+ });
  function domino() {
-	for(let i=0; i <= 28; i++) {
-		console.log('++ Fichas Creadas')
-	}
+	 return "++ Fichas creadas";
  }
 
  function getDomino(user) {
-	 console.log('Start')
-	 let a = Math.floor(Math.random()*(29-0))-0;
-	 fichas.push(5)
-	 console.log(fichas.find(5))
-	 // while(cont < 5) {
-		 // let a = Math.floor(Math.random()*(29-0))-0;
-		 // fichas.find(a)
-	 // }
+	 while(cont < 5) {
+		let a = Math.floor(Math.random()*(29-0))-0;
+		 console.log('esto es a'+a)
+		 fichas.push(dom[a]);
+		 cont++;
+	 }
+	 usuarios[user].fichas = fichas;
+	 return usuarios[user].fichas;
+ }
+ function reset(user) {
+	delete usuarios[user].fichas;
+	fichas = [];
+	cont = 0;
+	return "-- Eliminando fichas";
  }
