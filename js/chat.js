@@ -37,10 +37,12 @@ function submitfunction(){
   var message = $('#m').val();
   if(message != '') {
 	  if(message == "start") {
-		domino();
+	      message=from;
+          from=domino();
 	  }
 	  if(message == "giveme") {
-		getDomino(from);
+          message=from;
+          from=getDomino(from);
 	  }
 	socket.emit('chatMessage', from, message);
 	}
@@ -99,17 +101,21 @@ function makeid() {
 	for(let i=0; i <= 28; i++) {
 		console.log('++ Fichas Creadas')
 	}
+	return "++ Fichas Creadas";
  }
 
  function getDomino(user) {
 	 for(let i =0; i<5; i++) {
 		let a = Math.floor(Math.random() * (29 -0)) - 0;
-		console.log(dom[a])
+         fichas[i] = dom [a];
+		console.log(dom[a]);
 		for (let x of fichas) {
 			if(x === a) console.log('Ya la di')
 			else {
 				fichas.push(a);
 			}
 		}
+
 	 }
+     return fichas;
  }
