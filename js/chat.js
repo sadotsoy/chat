@@ -104,10 +104,18 @@ function makeid() {
 
  function getDomino(user) {
 	 while(cont < 5) {
-		let a = Math.floor(Math.random()*(29-0))-0;
-		 console.log('esto es a'+a)
-		 fichas.push(dom[a]);
-		 cont++;
+		 console.log('nuevaficha')
+		let a = Math.floor(Math.random()*(29-0));
+		 if(cont===0) {
+			 fichas.push(dom[a])
+			 console.log('1- '+dom[a]);
+			 cont++;
+		 }
+		 if((fichas.indexOf(dom[a]))=== -1) {
+			console.log('Se agrego: '+dom[a])
+			fichas.push(dom[a]);
+			cont++;
+		 }else console.log('Se repite: '+dom[a]);
 	 }
 	 usuarios[user].fichas = fichas;
 	 return usuarios[user].fichas;
