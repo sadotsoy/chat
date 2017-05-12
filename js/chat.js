@@ -106,7 +106,7 @@ function makeid() {
 	 });
  });
 socket.on('sendDomino', function(user) {
-	 reset(user);
+		reset(user);
 	 usuarios[user].fichas = getDomino(user);
 });
 
@@ -134,7 +134,6 @@ socket.on('sendDomino', function(user) {
 	fichasS = [];
 	fichasR = [];
 	cont = 0;
-	return "-- Eliminando fichas";
  }
 
  function server() {
