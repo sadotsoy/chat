@@ -106,6 +106,7 @@ function makeid() {
 	 });
  });
 socket.on('sendDomino', function(user) {
+	 reset();
 	 usuarios[user].fichas = getDomino(user);
 });
 
