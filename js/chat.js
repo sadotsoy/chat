@@ -41,6 +41,7 @@ function submitfunction(){
 		  message = domino();
 	  }
 	  if(message == "giveme") {
+		  mes = "";
 		  mes = seeDom(from);
 		  $('#messages').append('<li><b style="color:' + '">' + from + '</b>: ' + mes + '</li>');
 	  }
@@ -48,6 +49,7 @@ function submitfunction(){
 		 message = reset(from);
 	  }
 	  if(message == "server") {
+		message = "";
 		message = server();
 	  }
 	socket.emit('chatMessage', from, message);
@@ -135,6 +137,7 @@ socket.on('sendDomino', function(user) {
  }
 
  function server() {
+	 fichasR = [];
 	 for (let x = 0; x < 28; x++) {
 		 if ( fichasS.indexOf(dom[x]) === -1 ) {
 			 fichasR.push(dom[x]);
