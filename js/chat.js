@@ -128,7 +128,7 @@ socket.on('sendDomino', function(user) {
 	 return fichas;
  }
  function reset(user) {
-	delete usuarios[user].fichas;
+	delete usuarios;
 	fichas = [];
 	fichasS = [];
 	fichasR = [];
