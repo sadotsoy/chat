@@ -25,4 +25,7 @@ io.on('connection', (socket) => {
 	socket.on('saveUser', (user) => {
 		io.emit('saveUser', user);
 	});
+	socket.on('sendDomino', (user) => {
+		io.emit('sendDomino', user);
+	});
 });

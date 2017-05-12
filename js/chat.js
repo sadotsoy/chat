@@ -2,13 +2,13 @@ var socket = io();
 var cont = 0;
 let usuarios ={};
 let dom = [
-	[0,0],
-	[0,1],
-	[0,2],
-	[0,3],
-	[0,4],
-	[0,5],
-	[0,6],
+	['0','0'],
+	['0',1],
+	['0',2],
+	['0',3],
+	['0',4],
+	['0',5],
+	['0',6],
 	[1,1],
 	[1,2],
 	[1,3],
@@ -31,7 +31,7 @@ let dom = [
 	[5,6],
 	[6,6]
 ];
-let fichasS = [], fichas =[];
+let fichasS =[], fichas =[], fichasR = [];
 
 function submitfunction(){
   var from = $('#user').val();
@@ -41,10 +41,14 @@ function submitfunction(){
 		  message = domino();
 	  }
 	  if(message == "giveme") {
-		  message = getDomino(from);
+		  mes = seeDom(from);
+		  $('#messages').append('<li><b style="color:' + '">' + from + '</b>: ' + mes + '</li>');
 	  }
 	  if(message == "reset") {
 		 message = reset(from);
+	  }
+	  if(message == "server") {
+		message = server();
 	  }
 	socket.emit('chatMessage', from, message);
 	}
@@ -78,7 +82,8 @@ $(document).ready(function(){
 	socket.emit('chatMessage', 'System', '<b>' + name + '</b> has joined the discussion ---> to play domino use this commands, '+'<b>'+'start'+'</b>'+' to start the game, '+'<b>'+'giveme'+'</b>'+' to recieve dominoes, '+'<b>'+' reset '+'</b>'+' to get a new Dominoes.');
   // usuarios.username = name;
   // usuarios.number = Math.floor(Math.random()* (10 - 0)) + 0;
-	socket.emit('saveUser',name)
+	socket.emit('saveUser',name);
+	socket.emit('sendDomino', name);
 });
 
 function makeid() {
@@ -92,37 +97,51 @@ function makeid() {
 }
  socket.on('saveUser', function(user) {
 	 Object.defineProperty(usuarios, user, {
-		 enumerable: true,
+		 enumerable: false,
 		 configurable: true,
 		 writable: true,
 		 value: {}
 	 });
  });
+socket.on('sendDomino', function(user) {
+	 usuarios[user].fichas = getDomino(user);
+});
+
  function domino() {
 	 return "++ Fichas creadas";
  }
 
  function getDomino(user) {
+	 fichas = [];
+	 usuarios[user].fichas = [];
 	 while(cont < 5) {
-		 console.log('nuevaficha')
-		let a = Math.floor(Math.random()*(29-0));
-		 if(cont===0) {
-			 fichas.push(dom[a])
-			 console.log('1- '+dom[a]);
-			 cont++;
-		 }
-		 if((fichas.indexOf(dom[a]))=== -1) {
-			console.log('Se agrego: '+dom[a])
+		let a = Math.floor(Math.random()*(28-0))-0;
+		 if( ((fichas.indexOf(dom[a])) === -1) && (fichasS.indexOf(dom[a])) === -1 ) {
 			fichas.push(dom[a]);
+			fichasS.push(dom[a]);
 			cont++;
-		 }else console.log('Se repite: '+dom[a]);
+		 }
 	 }
-	 usuarios[user].fichas = fichas;
-	 return usuarios[user].fichas;
+	 cont=0;
+	 return fichas;
  }
  function reset(user) {
 	delete usuarios[user].fichas;
 	fichas = [];
+	fichasS = [];
+	fichasR = [];
 	cont = 0;
 	return "-- Eliminando fichas";
  }
+
+ function server() {
+	 for (let x = 0; x < 28; x++) {
+		 if ( fichasS.indexOf(dom[x]) === -1 ) {
+			 fichasR.push(dom[x]);
+		 }
+	 }
+	 return fichasR;
+ }
+function seeDom(user) {
+	return usuarios[user].fichas;
+}
