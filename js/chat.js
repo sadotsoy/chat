@@ -107,6 +107,7 @@ function makeid() {
  });
 socket.on('sendDomino', function(user) {
 	 usuarios[user].fichas = getDomino(user);
+	console.log(usuarios[user].fichas)
 });
 
  function domino() {
@@ -118,11 +119,9 @@ socket.on('sendDomino', function(user) {
 		let a = Math.floor(Math.random()*(28-0))-0;
 		 if( ((fichas.indexOf(dom[a])) === -1) && (fichasS.indexOf(dom[a])) === -1 ) {
 			fichas.push(dom[a]);
-			fichasS.push(dom[a]);
 			cont++;
 		 }
 	 }
-	 cont=0;
 	 return fichas;
  }
  function reset(user) {
@@ -134,13 +133,7 @@ socket.on('sendDomino', function(user) {
  }
 
  function server() {
-	 for (let x = 0; x < 28; x++) {
-		 if ( fichasS.indexOf(dom[x]) === -1 ) {
-			 console.log('wqe')
-			 fichasR.push(dom[x]);
-		 }
-	 }
-	 return fichasR;
+	 console.log(usuarios.fichasS)
  }
 function seeDom(user) {
 	return usuarios[user].fichas;
