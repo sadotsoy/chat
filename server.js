@@ -33,7 +33,7 @@ const socketIO = require('socket.io');
 const path = require('path');
 let usuarios = {};
 let fichas = [], fichasS = [], fichaR = [];
-let cont = 0;
+let cont = 0, nUser = 0;
 
 const PORT = process.env.PORT || 3000;
 const INDEX = path.join(__dirname, 'public', 'index.html');
@@ -46,39 +46,48 @@ const server = express()
 const io = socketIO(server);
 
 io.on('connection', (socket) => {
-	console.log('Chat Message')
-	socket.on('chatMessage', (from, msg) => {
-		io.emit('chatMessage', from, msg);
+	if( nUser < 3 ) {
+		console.log('Chat Message')
+		socket.on('chatMessage', (from, msg) => {
+			io.emit('chatMessage', from, msg);
+		});
+		socket.on('notifyUser', (user) => {
+			io.emit('notifyUser', user);
+		});
+		socket.on('saveUser', (user) => {
+			fichas = [];
+			usuarios[user] = {};
+			usuarios[user].fichas = [];
+		});
+		socket.on('sendDomino', (user) => {
+			getDomino(user);
+		});
+		socket.on('serverDomino', (user, message) => {
+			message = serverDomino();
+			io.emit('serverDomino', user, "Ficha restante: "+message);
+		});
+		socket.on('showDomino', (user, message) => {
+			message = showDomino(user);
+			io.emit('showDomino', user, "Tus fichas son: "+message);
+		});
+		socket.on('reset', (user) => {
+			cont =0;
+			fichasS = [];
+			usuarios[user].fichas = [];
+			console.log(usuarios)
+		});
+		socket.on('start', (user, message) => {
+			getDomino(user);
+		});
+		nUser++;
+		console.log(nUser);
+	}
+	socket.on('disconnect', function () {
+		nUser--;
+		console.log(nUser);
+		io.emit('user disconnected');
 	});
-	socket.on('notifyUser', (user) => {
-		io.emit('notifyUser', user);
-	});
-	socket.on('saveUser', (user) => {
-		fichas = [];
-		usuarios[user] = {};
-		usuarios[user].fichas = [];
-		// console.log(usuarios);
-	});
-	socket.on('sendDomino', (user) => {
-		getDomino(user);
-	});
-	socket.on('serverDomino', (user, message) => {
-		message = serverDomino();
-		io.emit('serverDomino', user, "Ficha restante: "+message);
-	});
-	socket.on('showDomino', (user, message) => {
-		message = showDomino(user);
-		io.emit('showDomino', user, "Tus fichas son: "+message);
-	});
-	socket.on('reset', (user) => {
-		cont =0;
-		fichasS = [];
-		usuarios[user].fichas = [];
-		console.log(usuarios)
-	});
-	socket.on('start', (user, message) => {
-		getDomino(user);
-	})
+
 });
 
 function getDomino(user) {
