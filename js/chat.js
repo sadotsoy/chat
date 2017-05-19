@@ -1,56 +1,20 @@
 var socket = io();
-var cont = 0;
-let usuarios ={};
-let dom = [
-	['0','0'],
-	['0',1],
-	['0',2],
-	['0',3],
-	['0',4],
-	['0',5],
-	['0',6],
-	[1,1],
-	[1,2],
-	[1,3],
-	[1,4],
-	[1,5],
-	[1,6],
-	[2,2],
-	[2,3],
-	[2,4],
-	[2,5],
-	[2,6],
-	[3,3],
-	[3,4],
-	[3,5],
-	[3,6],
-	[4,4],
-	[4,5],
-	[4,6],
-	[5,5],
-	[5,6],
-	[6,6]
-];
-let fichasS =[], fichas =[], fichasR = [];
 
 function submitfunction(){
   var from = $('#user').val();
   var message = $('#m').val();
   if(message != '') {
 	  if(message == "start") {
-		  message = domino();
+		  // socket.emit('start', from, message);
 	  }
 	  if(message == "giveme") {
-		  mes = "";
-		  mes = seeDom(from);
-		  $('#messages').append('<li><b style="color:' + '">' + from + '</b>: ' + mes + '</li>');
+		  socket.emit('showDomino', from, message);
 	  }
 	  if(message == "reset") {
-		 message = reset(from);
+		  // socket.emit('reset', from);
 	  }
 	  if(message == "server") {
-		message = "";
-		message = server();
+		  socket.emit('serverDomino', 'System', message);
 	  }
 	socket.emit('chatMessage', from, message);
 	}
@@ -81,7 +45,7 @@ socket.on('notifyUser', function(user){
 $(document).ready(function(){
   var name = makeid();
   $('#user').val(name);
-	socket.emit('chatMessage', 'System', '<b>' + name + '</b> has joined the discussion ---> to play domino use this commands, '+'<b>'+'start'+'</b>'+' to start the game, '+'<b>'+'giveme'+'</b>'+' to recieve dominoes, '+'<b>'+' reset '+'</b>'+' to get a new Dominoes.');
+	socket.emit('chatMessage', 'System', '<b>' + name + '</b> has joined the discussion ---> to play domino use this command:  '+'<b>'+'\"giveme\"'+'</b>'+' to recieve dominoes. <b>\"server\"</b> to see the last Dominoe');
   // usuarios.username = name;
   // usuarios.number = Math.floor(Math.random()* (10 - 0)) + 0;
 	socket.emit('saveUser',name);
@@ -97,44 +61,21 @@ function makeid() {
   }
   return text;
 }
- socket.on('saveUser', function(user) {
-	 Object.defineProperty(usuarios, user, {
-		 enumerable: false,
-		 configurable: true,
-		 writable: true,
-		 value: {}
-	 });
- });
+socket.on('saveUser', function(user) {
+});
 socket.on('sendDomino', function(user) {
-	 usuarios[user].fichas = getDomino(user);
-	console.log(usuarios[user].fichas)
+});
+socket.on('serverDomino', function(user, message) {
+  $('#messages').append('<li><b style="color:' + '">' + user + '</b>: ' + message + '</li>');
+});
+socket.on('showDomino', function(user, message) {
+	showDomino(user, message);
 });
 
  function domino() {
 	 return "++ Fichas creadas";
  }
 
- function getDomino(user) {
-	 while(cont < 5) {
-		let a = Math.floor(Math.random()*(28-0))-0;
-		 if( ((fichas.indexOf(dom[a])) === -1) && (fichasS.indexOf(dom[a])) === -1 ) {
-			fichas.push(dom[a]);
-			cont++;
-		 }
-	 }
-	 return fichas;
- }
- function reset(user) {
-	delete usuarios[user].fichas;
-	fichas = [];
-	fichasS = [];
-	fichasR = [];
-	cont = 0;
- }
-
- function server() {
-	 console.log(usuarios.fichasS)
- }
-function seeDom(user) {
-	return usuarios[user].fichas;
+function showDomino(user, message){
+  $('#messages').append('<li><b style="color:' + '">' + user + '</b>: ' + message + '</li>');
 }
