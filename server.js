@@ -106,7 +106,6 @@ function getDomino(user) {
   usuarios[user].fichas = fichas;
   // console.log("Fichas dadas"+fichasS);
   console.log(usuarios);
-  console.log(dom[5].charAt(3));
 }
 
 function serverDomino() {
