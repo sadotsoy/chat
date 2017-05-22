@@ -71,7 +71,7 @@ io.on('connection', (socket) => {
     });
     socket.on('showDomino', (user, message) => {
       message = showDomino(user);
-      io.emit('showDomino', user, "Tus fichas son: " + message);
+      socket.emit('showDomino', user, "Tus fichas son: " + message);
     });
     socket.on('reset', (user) => {
       cont = 0;
