@@ -16,9 +16,14 @@ function submitfunction(){
 	  if(message == "server") {
 		  socket.emit('serverDomino', 'System', message);
 	  }
+    if(message == "clear"){
+        socket.emit('clear','','');
+    }
+
 	socket.emit('chatMessage', from, message);
-	}
+}
 	$('#m').val('').focus();
+
 	return false;
 }
 
@@ -71,7 +76,9 @@ socket.on('serverDomino', function(user, message) {
 socket.on('showDomino', function(user, message) {
 	showDomino(user, message);
 });
-
+socket.on('clear', function() {
+    $('#messages').html("");
+});
  function domino() {
 	 return "++ Fichas creadas";
  }
