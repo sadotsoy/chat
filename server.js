@@ -32,7 +32,10 @@ let lHLPos = 0; // Last Horizontal Left Position Accepted
 let lVRPos = 0; // Last Vertical Right Position Accepted
 let lHRPos = 0; // Last Horizontal Right Position Accepted
 
-let start = false;
+let lDRPos = "R"; // Last Direction Right Position
+let lDLPos = "L"; // Last Direction Left Position
+
+let start = false; // Game State
 
 let playerTurn = 0; // Player with turn 
 
@@ -71,6 +74,8 @@ let dom = [
     '6,6' ];
 
 
+
+
 const express = require('express');
 const socketIO = require('socket.io');
 const path = require('path');
@@ -104,6 +109,9 @@ io.on('connection', (socket) => {
 		fichas = [];
 		usuarios[user] = {};
 		usuarios[user].fichas = [];
+		usuarios[user].tfichas = 0;
+		usuarios[user].lUficha = -1;
+		usuarios[user].turno = -1;
 	});
 
 	socket.on('sendDomino', (user) => {
@@ -125,47 +133,105 @@ io.on('connection', (socket) => {
 
 	//Moving the domino chips
 	socket.on('move', (user, message) => {
-		let chip = parseInt(message.charAt(3)) - 1; // Get the message position of chip
-		let side = message.charAt(5); // Get the side to put the chip
-		let pos  = message.charAt(7); // Get the position to put the chip
+		if( usuarios[user].turno === playerTurn){
 
-		if( pos == "l" || pos == "L" ){
+			let chip = parseInt(message.charAt(3)) - 1; // Get the message position of chip
+			let side = message.charAt(5); // Get the side to put the chip
+			let pos  = message.charAt(7); // Get the position to put the chip
 
-			// Checking if any of the numbers equals to the last Left chip's number
-			if( (parseInt(usuarios[user].fichas[chip].charAt(0)) === parseInt( map[vLPos].charAt(hLPos)) ) || ( parseInt(usuarios[user].fichas[chip].charAt(2)) === parseInt( map[vLPos].charAt(hLPos)) ) ){
-				console.log("SI se puede!");
-				console.log(hLPos);
-				hLPos -= 2;
-				console.log(hLPos);
- 
-			dominoToMap(lvLPos, hLPos, "L", usuarios[user].fichas[chip], pos);
-			}else{
-				console.log(usuarios[user].fichas[chip]);
-				console.log("Not a valid chip");
+			usuarios[user].lUficha = chip;
+			
+			if( side == "l" || side == "L" ){
+
+				/*console.log(map[lVLPos].charAt(lHLPos));
+				 *console.log(map[lVLPos].charAt(lHLPos+2));
+				 *console.log(lVLPos);
+				 *console.log(lHLPos);
+				*/
+
+				// Checking if any of the numbers equals to the last Left chip's number and know what possition to take
+				if( parseInt(usuarios[user].fichas[chip].charAt(0)) === parseInt( map[lVLPos].charAt(lHLPos)) ){
+					chip = reverseString(usuarios[user].fichas[chip]);
+
+					hLPos -= 2;
+					dominoToMap(user, lVLPos, lHLPos, "L", chip, pos);
+
+				}else if( parseInt(usuarios[user].fichas[chip].charAt(2)) === parseInt( map[lVLPos].charAt(lHLPos)) ){
+					chip = usuarios[user].fichas[chip];
+
+					hLPos -= 2;
+					dominoToMap(user, lVLPos, lHLPos, "L", chip, pos);
+
+				}else{
+					//console.log(usuarios[user].fichas[chip]);
+					console.log("Not a valid chip");
+				}
+
+			}else if( side == "r" || side == "R" ){
+
+				// Checking if any of the numbers equals to the last Right chip's number
+
+				/*console.log(map[lVRPos].charAt(lHRPos-2));
+				 *console.log(map[lVRPos].charAt(lHRPos));
+				 *console.log(lVRPos);
+				 *console.log(lHRPos);
+				*/
+
+				// Checking if any of the numbers equals to the last Left chip's number and know what possition to take
+				if( parseInt(usuarios[user].fichas[chip].charAt(0)) === parseInt( map[lVRPos].charAt(lHRPos)) ){
+					chip = usuarios[user].fichas[chip]
+
+					hRPos += 2;
+					dominoToMap(user, lVRPos, lHRPos, "R", chip, pos);
+
+				}else if( parseInt(usuarios[user].fichas[chip].charAt(2)) === parseInt( map[lVRPos].charAt(lHRPos)) ){ 
+					chip = reverseString(usuarios[user].fichas[chip]);
+
+					hRPos += 2;
+					dominoToMap(user, lVRPos, lHRPos, "R", chip, pos);
+
+				}else{
+					//console.log(usuarios[user].fichas[chip]);
+					console.log("Not a valid chip");
+				}
 			}
-
-		}else if( pos == "r" || pos == "R" ){
-
-			// Checking if any of the numbers equals to the last Right chip's number
-			if( (parseInt(usuarios[user].fichas[chip].charAt(0)) === parseInt( map[vLPos].charAt(hLPos)) ) || ( parseInt(usuarios[user].fichas[chip].charAt(2)) === parseInt( map[vLPos].charAt(hLPos)) ) ){
-				hRPos += 2;
-				dominoToMap(vRPos, hRPos, "R", usuarios[user].fichas[chip], pos);
-				console.log("2nd");
-			}else{
-				console.log(usuarios[user].fichas[chip]):
-				console.log("Not a valid chip");
-			}
+		}else{
+			io.emit('showDomino', user, " <<-- Sorry it is not your turn ");
 		}
 
 	});
 
+	socket.on('turn', (user) =>{
+		var turn = -1;
+
+		for(var t in usuarios ){
+			console.log(t);
+			if( t.turno == playerTurn){
+
+			}
+		}
+
+		io.emit('showDomino', 'System', "It is " + playerTurn + " Turn");
+	});
+
+	socket.on('pass', (user) =>{
+		if( usuarios[user].turno === playerTurn){
+			playerTurn += 1;
+			io.emit('showDomino', user, " <<-- You have passed you turn");
+		}else{
+			io.emit('showDomino', user, " <<-- Sorry it is not your turn");
+		}
+	});
+
 	socket.on('reset', (user) => {
-		let idx = 1;
+		let chip = fichasS[0];
 
-		let chip = fichasS[idx-1];
+		dominoToMap(user, vRPos, hRPos, "R", chip, "R");
 
-		dominoToMap(vRPos, hLPos, chip, "R");
+		playerTurn = 0;
 
+		lVLPos = lVRPos;
+		lHLPos = lHRPos-2;
 	});
 
 	socket.on('start', (user, message) => {
@@ -183,6 +249,25 @@ io.on('connection', (socket) => {
 
 });
 
+
+function reverseString(str) {
+    // Step 1. Use the split() method to return a new array
+    var splitString = str.split(""); // var splitString = "hello".split("");
+    // ["h", "e", "l", "l", "o"]
+ 
+    // Step 2. Use the reverse() method to reverse the new created array
+    var reverseArray = splitString.reverse(); // var reverseArray = ["h", "e", "l", "l", "o"].reverse();
+    // ["o", "l", "l", "e", "h"]
+ 
+    // Step 3. Use the join() method to join all elements of the array into a string
+    var joinArray = reverseArray.join(""); // var joinArray = ["o", "l", "l", "e", "h"].join("");
+    // "olleh"
+    
+    //Step 4. Return the reversed string
+    return joinArray; // "olleh"
+}
+
+
 // Gives domino chips to "fichas" and "fichasS"
 function getDomino(user) {
 	while(cont < 9) {
@@ -194,8 +279,13 @@ function getDomino(user) {
 		}
 	}
 	cont = 0;
-	usuarios[user].fichas = fichas;
-	console.log(usuarios);
+	usuarios[user].fichas = fichas; // Assign the player's domino chips
+	usuarios[user].tfichas = fichas.length; // Assign the player's total domino chips
+	if(playerTurn < 2){
+		usuarios[user].turno = playerTurn++; // Assign the player turn and increment
+	}
+
+	//console.log(usuarios);
 }
 
 
@@ -228,19 +318,50 @@ function changeChar(index, str, toChange){
  *	ficha: 'ficha' to put on the map
  *	pos  : the 'Up' 'Down' 'Right' 'Left' Position for the next side of 'ficha'
 */
-function dominoToMap(vPos, hPos, dir, ficha, pos){
+function dominoToMap(user, vPos, hPos, dir, ficha, pos){
+
+	let passTurn = false;
 
 	let chipL = ficha.charAt(0); // Domino chip Left side
 	let chipR = ficha.charAt(2); // Domino chip Right side
-
-	console.log(ficha);
 
 	pos = pos.toUpperCase();
 	switch(pos){
 		case "U": 
 			if ( map[vPos-1].charAt(hPos) === " " ){ // Check if field is empty
 				if(start){
-					hPos += 3;
+					if( dir === "L"){
+						switch(lDLPos){
+							case "U":
+								break;
+
+							case "D":
+								break;
+
+							case "R":
+								break;
+
+							case "L":
+								break;
+						}
+						hPos -= 3;
+					}
+					else if( dir === "R"){
+						switch(lDRPos){
+							case "U":
+								break;
+
+							case "D":
+								break;
+
+							case "R":
+								break;
+
+							case "L":
+								break;
+						}
+						hPos += 3;
+					}
 				}
 
 				map[vPos]   = changeChar(hPos-1, map[vPos], "[");
@@ -259,6 +380,11 @@ function dominoToMap(vPos, hPos, dir, ficha, pos){
 					lVRPos = vPos-1;
 				}
 
+				usuarios[user].tfichas -= 1; // Decrease the user's domino chip counter;
+				delete usuarios[user].fichas[usuarios[user].lUficha-1]; // delete the user's domino chip used
+
+				passTurn = true;
+
 			}else{
 				console.log("This action is not allowed");
 			}
@@ -266,6 +392,14 @@ function dominoToMap(vPos, hPos, dir, ficha, pos){
 
 		case "D":
 			if (  map[vPos+1].charAt(hPos) === " " ){ // Check if field is empty
+				if(start){
+					if( dir === "L"){
+						hPos -= 3;
+					}
+					else if( dir === "R" ){
+						hPos += 3;
+					}
+				}
 
 				map[vPos]   = changeChar(hPos-1, map[vPos], "[");
 				map[vPos]   = changeChar(hPos  , map[vPos], chipL);
@@ -282,6 +416,11 @@ function dominoToMap(vPos, hPos, dir, ficha, pos){
 					lHRPos = hPos;
 					lVRPos = vPos+1;
 				}
+
+				usuarios[user].tfichas--; // Decrease the user's domino chip counter;
+				delete usuarios[user].fichas[usuarios[user].lUficha]; // delete the user's domino chip used
+
+				passTurn = true;
 
 			}else{
 				console.log("This action is not allowed");
@@ -308,6 +447,12 @@ function dominoToMap(vPos, hPos, dir, ficha, pos){
 					lVRPos = vPos;
 				}
 
+				usuarios[user].tfichas--; // Decrease the user's domino chip counter;
+				//delete usuarios[user].fichas[usuarios[user].lUficha]; // delete the user's domino chip used
+				usuarios[user].fichas.splice(usuarios[user].lUficha);
+
+				passTurn = true;
+
 			}else{
 				console.log("This action is not allowed");
 			}
@@ -319,11 +464,11 @@ function dominoToMap(vPos, hPos, dir, ficha, pos){
 					hPos -= 3;
 				}
 
-				map[vPos] = changeChar(hPos+1, map[vPos], "[");
-				map[vPos] = changeChar(hPos  , map[vPos], chipL);
+				map[vPos] = changeChar(hPos-3, map[vPos], "[");
+				map[vPos] = changeChar(hPos-2, map[vPos], chipL);
 				map[vPos] = changeChar(hPos-1, map[vPos], "|");
-				map[vPos] = changeChar(hPos-2, map[vPos], chipR);
-				map[vPos] = changeChar(hPos-3, map[vPos], "]");
+				map[vPos] = changeChar(hPos  , map[vPos], chipR);
+				map[vPos] = changeChar(hPos+1, map[vPos], "]");
 
 				if(dir === "L" ){
 					lHLPos = hPos-2;
@@ -332,6 +477,11 @@ function dominoToMap(vPos, hPos, dir, ficha, pos){
 					lHRPos = hPos-2;
 					lVRPos = vPos;
 				}
+
+				usuarios[user].tfichas--; // Decrease the user's domino chip counter;
+				delete usuarios[user].fichas[usuarios[user].lUficha]; // delete the user's domino chip used
+
+				passTurn = true;
 
 			}else{
 				console.log("This action is not allowed");
@@ -342,8 +492,15 @@ function dominoToMap(vPos, hPos, dir, ficha, pos){
 			console.log("Bad Function Composition");
 	}
 
-	if (!start){
+	if (!start){ // If game hasn't started then start
 		start = !start;
+	}
+	if( passTurn ){
+		if(playerTurn === 2){
+			playerTurn = 0;
+		}else{
+			playerTurn += 1;
+		}
 	}
 
 	console.log(map);

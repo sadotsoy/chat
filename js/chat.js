@@ -16,6 +16,10 @@ function submitfunction(){
 			socket.emit('serverDomino', 'System', message);
 		}else if(message == "map"){
 			socket.emit('showMap', from);
+		}else if(message == "turn"){
+			socket.emit('turn', from);
+		}else if(message == "pass"){
+			socket.emit('pass', from);
 		}else if(message.charAt(0) == "g" && message.charAt(1) == "o" && message.charAt(2) == "(" && message.charAt(message.length-1) == ")" ){
 			
 			socket.emit('move', from, message);
