@@ -1,5 +1,5 @@
 # chat
-Simple chat application with nodejs
+Simple chat application with nodejs and integrated CLI to play Dominoes.
 
 This is the first practice to distribuited systems, this chat was made with
 [Node.js](https://nodejs.org/en/), [ExpressJs](http://expressjs.com/) &
